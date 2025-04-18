@@ -43,8 +43,8 @@ export type Vericred = {
       ],
       "args": [
         {
-          "name": "count",
-          "type": "u8"
+          "name": "cid",
+          "type": "string"
         }
       ]
     }
@@ -71,8 +71,8 @@ export type Vericred = {
         "kind": "struct",
         "fields": [
           {
-            "name": "count",
-            "type": "u8"
+            "name": "cid",
+            "type": "string"
           }
         ]
       }

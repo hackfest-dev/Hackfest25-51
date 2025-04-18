@@ -15,7 +15,7 @@ describe('vericred', () => {
 
   it('Initialize Vericred', async () => {
     await program.methods
-      .initialize(1)
+      .initialize("1")
       .accounts({
         vericred: vericredKeypair.publicKey,
         payer: payer.publicKey,
@@ -25,7 +25,7 @@ describe('vericred', () => {
 
     const currentCount = await program.account.vericred.fetch(vericredKeypair.publicKey)
 
-    expect(currentCount.count).toEqual(1)
+    expect(currentCount.cid).toEqual("1")
   })
 
 })

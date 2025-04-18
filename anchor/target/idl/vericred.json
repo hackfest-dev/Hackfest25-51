@@ -37,8 +37,8 @@
       ],
       "args": [
         {
-          "name": "count",
-          "type": "u8"
+          "name": "CID",
+          "type": "string"
         }
       ]
     }
@@ -65,8 +65,8 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "count",
-            "type": "u8"
+            "name": "CID",
+            "type": "string"
           }
         ]
       }
