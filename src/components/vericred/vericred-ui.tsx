@@ -58,7 +58,7 @@ function VericredCard({ account }: { account: PublicKey }) {
     account,
   })
 
-  const count = useMemo(() => accountQuery.data?.count ?? 0, [accountQuery.data?.count])
+  const CID = useMemo(() => accountQuery.data?.cid ?? 0, [accountQuery.data?.cid])
 
   return accountQuery.isLoading ? (
     <span className="loading loading-spinner loading-lg"></span>
@@ -67,7 +67,7 @@ function VericredCard({ account }: { account: PublicKey }) {
       <div className="card-body items-center text-center">
         <div className="space-y-6">
           <h2 className="card-title justify-center text-3xl cursor-pointer" onClick={() => accountQuery.refetch()}>
-            {count}
+            {CID}
           </h2>
         </div>
       </div>

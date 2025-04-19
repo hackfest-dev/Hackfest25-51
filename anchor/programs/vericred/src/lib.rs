@@ -10,6 +10,7 @@ pub mod vericred {
     use super::*;
 
   pub fn initialize(ctx: Context<InitializeVericred>,CID:String) -> Result<()> {
+    msg!("1");
     ctx.accounts.vericred.CID=CID;
     Ok(())
   }

@@ -1,5 +1,6 @@
-import DashboardFeature from '@/components/dashboard/dashboard-feature'
+import CertificateForm from "@/components/clgmint/form";
+
 
 export default function Page() {
-  return <DashboardFeature />
+  return <CertificateForm/>
 }

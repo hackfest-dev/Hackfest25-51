@@ -31,7 +31,7 @@ export function useVericredProgram() {
   const initialize = useMutation({
     mutationKey: ['vericred', 'initialize', { cluster }],
     mutationFn: (keypair: Keypair) =>
-      program.methods.initialize().accounts({ vericred: keypair.publicKey }).signers([keypair]).rpc(),
+      program.methods.initialize("1").accounts({ vericred: keypair.publicKey }).signers([keypair]).rpc(),
     onSuccess: (signature) => {
       transactionToast(signature)
       return accounts.refetch()
@@ -57,48 +57,7 @@ export function useVericredProgramAccount({ account }: { account: PublicKey }) {
     queryKey: ['vericred', 'fetch', { cluster, account }],
     queryFn: () => program.account.vericred.fetch(account),
   })
-
-  const closeMutation = useMutation({
-    mutationKey: ['vericred', 'close', { cluster, account }],
-    mutationFn: () => program.methods.close().accounts({ vericred: account }).rpc(),
-    onSuccess: (tx) => {
-      transactionToast(tx)
-      return accounts.refetch()
-    },
-  })
-
-  const decrementMutation = useMutation({
-    mutationKey: ['vericred', 'decrement', { cluster, account }],
-    mutationFn: () => program.methods.decrement().accounts({ vericred: account }).rpc(),
-    onSuccess: (tx) => {
-      transactionToast(tx)
-      return accountQuery.refetch()
-    },
-  })
-
-  const incrementMutation = useMutation({
-    mutationKey: ['vericred', 'increment', { cluster, account }],
-    mutationFn: () => program.methods.increment().accounts({ vericred: account }).rpc(),
-    onSuccess: (tx) => {
-      transactionToast(tx)
-      return accountQuery.refetch()
-    },
-  })
-
-  const setMutation = useMutation({
-    mutationKey: ['vericred', 'set', { cluster, account }],
-    mutationFn: (value: number) => program.methods.set(value).accounts({ vericred: account }).rpc(),
-    onSuccess: (tx) => {
-      transactionToast(tx)
-      return accountQuery.refetch()
-    },
-  })
-
   return {
     accountQuery,
-    closeMutation,
-    decrementMutation,
-    incrementMutation,
-    setMutation,
   }
 }
