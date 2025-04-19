@@ -21,7 +21,7 @@ export function getVericredProgramId(cluster: Cluster) {
     case 'devnet':
     case 'testnet':
       // This is the program ID for the Vericred program on devnet and testnet.
-      return new PublicKey('coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF')
+      return new PublicKey('BUnZHEsqHYAnE2k4qiEA93VXcMNqPz9a2e2tYjWct6AH')
     case 'mainnet-beta':
     default:
       return VERICRED_PROGRAM_ID

@@ -9,6 +9,7 @@ import { VericredCreate, VericredList } from './vericred-ui'
 
 export default function VericredFeature() {
   const { publicKey } = useWallet()
+  console.log(publicKey);
   const { programId } = useVericredProgram()
 
   return publicKey ? (

@@ -12,7 +12,7 @@ export function VericredCreate() {
   return (
     <button
       className="btn btn-xs lg:btn-md btn-primary"
-      onClick={() => initialize.mutateAsync(Keypair.generate())}
+      onClick={() => initialize.mutateAsync({keypair:Keypair.generate(),CID:"1"})}
       disabled={initialize.isPending}
     >
       Create {initialize.isPending && '...'}
@@ -40,7 +40,7 @@ export function VericredList() {
       ) : accounts.data?.length ? (
         <div className="grid md:grid-cols-2 gap-4">
           {accounts.data?.map((account) => (
-            <VericredCard key={account.publicKey.toString()} account={account.publicKey} />
+            <TestCard key={account.publicKey.toString()} account={account.publicKey} />
           ))}
         </div>
       ) : (
@@ -53,8 +53,8 @@ export function VericredList() {
   )
 }
 
-function VericredCard({ account }: { account: PublicKey }) {
-  const { accountQuery} = useVericredProgramAccount({
+function TestCard({ account }: { account: PublicKey }) {
+  const { accountQuery,} = useVericredProgramAccount({
     account,
   })
 

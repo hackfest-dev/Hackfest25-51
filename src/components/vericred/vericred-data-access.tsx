@@ -1,7 +1,7 @@
 'use client'
 
-import { getVericredProgram, getVericredProgramId } from '@project/anchor'
-import { useConnection, useWallet } from '@solana/wallet-adapter-react'
+import { getVericredProgram,getVericredProgramId } from '@project/anchor'
+import { useConnection } from '@solana/wallet-adapter-react'
 import { Cluster, Keypair, PublicKey } from '@solana/web3.js'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
@@ -11,7 +11,6 @@ import { useAnchorProvider } from '../solana/solana-provider'
 import { useTransactionToast } from '../ui/ui-layout'
 
 export function useVericredProgram() {
-  const {publicKey}=useWallet();
   const { connection } = useConnection()
   const { cluster } = useCluster()
   const transactionToast = useTransactionToast()
@@ -20,7 +19,7 @@ export function useVericredProgram() {
   const program = useMemo(() => getVericredProgram(provider, programId), [provider, programId])
 
   const accounts = useQuery({
-    queryKey: ['vericred', 'all', { cluster }],
+    queryKey: ['test', 'all', { cluster }],
     queryFn: () => program.account.vericred.all(),
   })
 
@@ -30,9 +29,9 @@ export function useVericredProgram() {
   })
 
   const initialize = useMutation({
-    mutationKey: ['vericred', 'initialize', { cluster }],
+    mutationKey: ['test', 'initialize', { cluster }],
     mutationFn: ({keypair,CID}:{keypair:Keypair,CID:String}) =>
-      program.methods.initialize(CID.toString()).accounts({ vericred: keypair.publicKey }).signers([keypair]).rpc(),
+      program.methods.initialize(CID).accounts({ vericred: keypair.publicKey }).signers([keypair]).rpc(),
     onSuccess: (signature) => {
       transactionToast(signature)
       return accounts.refetch()
@@ -55,9 +54,12 @@ export function useVericredProgramAccount({ account }: { account: PublicKey }) {
   const { program, accounts } = useVericredProgram()
 
   const accountQuery = useQuery({
-    queryKey: ['vericred', 'fetch', { cluster, account }],
+    queryKey: ['test', 'fetch', { cluster, account }],
     queryFn: () => program.account.vericred.fetch(account),
   })
+
+  
+
   return {
     accountQuery,
   }

@@ -3,7 +3,6 @@ import { ClusterProvider, useCluster } from '@/components/cluster/cluster-data-a
 import { SolanaProvider } from '@/components/solana/solana-provider'
 import { UiLayout } from '@/components/ui/ui-layout'
 import { ReactQueryProvider } from './react-query-provider'
-import WalletButton from '@/components/wallet/wallet-button'
 import { useMemo } from 'react'
 
 export const metadata = {
@@ -21,10 +20,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <ReactQueryProvider>
+      <ReactQueryProvider>
           <ClusterProvider>
             <SolanaProvider>
-            {children}
+              <UiLayout links={links}>{children}</UiLayout>
             </SolanaProvider>
           </ClusterProvider>
         </ReactQueryProvider>

@@ -2,12 +2,12 @@
  * Program IDL in camelCase format in order to be used in JS/TS.
  *
  * Note that this is only a type helper and is not the actual IDL. The original
- * IDL can be found at `target/idl/vericred.json`.
+ * IDL can be found at `target/idl/test.json`.
  */
-export type Vericred = {
+export type Test = {
   "address": "BUnZHEsqHYAnE2k4qiEA93VXcMNqPz9a2e2tYjWct6AH",
   "metadata": {
-    "name": "vericred",
+    "name": "test",
     "version": "0.1.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
@@ -32,7 +32,7 @@ export type Vericred = {
           "signer": true
         },
         {
-          "name": "vericred",
+          "name": "test",
           "writable": true,
           "signer": true
         },
@@ -51,22 +51,22 @@ export type Vericred = {
   ],
   "accounts": [
     {
-      "name": "vericred",
+      "name": "test",
       "discriminator": [
-        97,
-        211,
-        231,
-        172,
-        79,
-        29,
-        108,
-        148
+        21,
+        124,
+        154,
+        78,
+        247,
+        222,
+        89,
+        189
       ]
     }
   ],
   "types": [
     {
-      "name": "vericred",
+      "name": "test",
       "type": {
         "kind": "struct",
         "fields": [
