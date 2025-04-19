@@ -242,7 +242,7 @@ export default function CertificateForm() {
 
                   <div className="space-y-2">
                     <Label htmlFor="duration" className="font-medium text-indigo-900">
-                      Duration
+                      Duration (In years)
                     </Label>
                     <div className="relative">
                       <Input
