@@ -10,8 +10,6 @@ export default function CertificateForm() {
     profilePhoto: null as File | null,
     universityName: '',
     degreeName: '',
-    fieldOfStudy: '',
-    honors: '',
     graduationYear: '',
     issueDate: '',
     duration: '',
@@ -38,15 +36,24 @@ export default function CertificateForm() {
       }
     }
 
-    const res = await fetch('/api/submit-form', {
-      method: 'POST',
-      body: payload,
-    });
+    try {
+      const res = await fetch('/api/pinata', {
+        method: 'POST',
+        body: payload,
+      });
 
-    if (res.ok) {
-      alert('Form submitted successfully!');
-    } else {
-      alert('Failed to submit form.');
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.error('Error response:', data);
+        alert(`Failed to submit form: ${data.error?.message || JSON.stringify(data.error) || 'Unknown error'}`);
+      } else {
+        alert('Form submitted successfully!');
+        console.log('IPFS Hash:', data.ipfsHash);
+      }
+    } catch (err) {
+      console.error('Unexpected error:', err);
+      alert('Something went wrong. Check the console for details.');
     }
   };
 
@@ -59,8 +66,6 @@ export default function CertificateForm() {
         <Input name="email" label="Email" type="email" value={formData.email} onChange={handleChange} />
         <Input name="universityName" label="University Name" value={formData.universityName} onChange={handleChange} />
         <Input name="degreeName" label="Degree Name" value={formData.degreeName} onChange={handleChange} />
-        <Input name="fieldOfStudy" label="Field of Study" value={formData.fieldOfStudy} onChange={handleChange} />
-        <Input name="honors" label="Honors" value={formData.honors} onChange={handleChange} />
         <Input name="graduationYear" label="Graduation Year" value={formData.graduationYear} onChange={handleChange} />
         <Input name="issueDate" label="Issue Date" type="date" value={formData.issueDate} onChange={handleChange} />
         <Input name="duration" label="Duration" value={formData.duration} onChange={handleChange} />
