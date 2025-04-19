@@ -1,14 +1,14 @@
 interface Data {
-  fullName: String;
-  studentId: String;
-  email: String;
+  fullName: String|"";
+  studentId: String|"";
+  email: String|"";
   profilePhoto: File | null;
-  universityName: String;
-  degreeName: String;
-  graduationYear: String;
-  issueDate: String;
-  duration: String;
-  cgpa: String;
+  universityName: String|"";
+  degreeName: String|"";
+  graduationYear: String|"";
+  issueDate: String|"";
+  duration: String|"";
+  cgpa: String|"";
 }
 
 export default function Degree(props: Data) {
@@ -28,7 +28,7 @@ export default function Degree(props: Data) {
         </div>
 
         {/* Student Photo */}
-        {props.profilePhoto && (
+        {/* {props.profilePhoto && (
           <div className="flex justify-center mb-6">
             <img
               src={URL.createObjectURL(props.profilePhoto)}
@@ -36,7 +36,7 @@ export default function Degree(props: Data) {
               className="w-24 h-24 rounded-full border-4 border-indigo-200 shadow-lg"
             />
           </div>
-        )}
+        )} */}
 
         {/* Student Name */}
         <div className="text-center mb-8">

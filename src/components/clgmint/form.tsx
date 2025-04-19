@@ -121,7 +121,7 @@ export default function CertificateForm() {
           {/* Progress indicator */}
           <div className="bg-white rounded-lg shadow-sm border border-indigo-100 p-4 mb-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-medium text-indigo-900">Application Progress</h3>
+              <h3 className="font-medium text-indigo-900">Form Progress</h3>
               <span className="text-sm font-bold text-indigo-700">{getCompletionPercentage()}% Complete</span>
             </div>
             <div className="w-full bg-indigo-100 rounded-full h-2.5">
