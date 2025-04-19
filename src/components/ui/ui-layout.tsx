@@ -17,8 +17,8 @@ export function UiLayout({ children, links }: { children: ReactNode; links: { la
     <div className="h-full flex flex-col">
       <div className="navbar bg-base-300 dark:text-neutral-content flex-col md:flex-row space-y-2 md:space-y-0">
         <div className="flex-1">
-          <Link className="btn btn-ghost normal-case text-xl" href="/vericred">
-            Transaction
+          <Link className="btn btn-ghost normal-case text-xl" href="/test" target='_blank'>
+            Transactions
           </Link>
         </div>
         <div className="flex-none space-x-2">

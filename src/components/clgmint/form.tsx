@@ -11,13 +11,11 @@ import { Calendar, GraduationCap, Mail, User, FileImage, Award, CalendarIcon, Cl
 import { useWallet } from "@solana/wallet-adapter-react"
 import { useVericredProgram } from "../vericred/vericred-data-access"
 import { Keypair } from "@solana/web3.js"
+import Degree from "@/components/degree/degree-ui"
 
 export default function CertificateForm() {
   const { publicKey } = useWallet();
   const { programId, initialize } = useVericredProgram();
-
-  console.log(publicKey?.toString());
-  console.log(programId.toString());
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -32,8 +30,8 @@ export default function CertificateForm() {
     cgpa: "",
   })
 
-  // State to track if full screen preview is open
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+  const [isDegreePreviewOpen, setIsDegreePreviewOpen] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, files } = e.target as HTMLInputElement
@@ -47,7 +45,6 @@ export default function CertificateForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const payload = new FormData()
-
     for (const key in formData) {
       const value = (formData as any)[key]
       if (value) {
@@ -67,17 +64,17 @@ export default function CertificateForm() {
         console.error("Error response:", data)
         alert(`Failed to submit form: ${data.error?.message || JSON.stringify(data.error) || "Unknown error"}`)
       } else {
-        console.log(data.ipfsHash.toString());
         initialize.mutateAsync({ keypair: Keypair.generate(), CID: data.ipfsHash.toString() });
-      }
-    } catch (err) {
+      };
+    }
+    catch (err) {
       console.error("Unexpected error:", err)
       alert("Something went wrong. Check the console for details.")
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-slate-100 py-12 px-4 sm:px-6">
+    <div className="min-h-screen min-w-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-slate-100 py-12 px-4 sm:px-6">
       <div className="fixed inset-0 overflow-hidden -z-10">
         <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-indigo-200 opacity-20 blur-3xl"></div>
         <div className="absolute top-1/4 -left-20 w-72 h-72 rounded-full bg-blue-300 opacity-20 blur-3xl"></div>
@@ -164,6 +161,7 @@ export default function CertificateForm() {
                   </div>
                 </div>
               </div>
+
               <div className="space-y-6 pt-4">
                 <div className="flex items-center gap-2 pb-2 border-b border-indigo-100">
                   <GraduationCap className="h-5 w-5 text-indigo-700" />
@@ -242,7 +240,7 @@ export default function CertificateForm() {
 
                   <div className="space-y-2">
                     <Label htmlFor="duration" className="font-medium text-indigo-900">
-                      Duration (In years)
+                      Duration
                     </Label>
                     <div className="relative">
                       <Input
@@ -275,6 +273,7 @@ export default function CertificateForm() {
                   </div>
                 </div>
               </div>
+
               <div className="mt-8 rounded-xl border border-indigo-100 overflow-hidden bg-gradient-to-b from-indigo-50 to-white">
                 <div className="bg-indigo-600 text-white px-6 py-4">
                   <div className="flex items-center gap-2">
@@ -332,6 +331,14 @@ export default function CertificateForm() {
 
           <CardFooter className="flex justify-end p-8 border-t border-indigo-100 bg-indigo-50/50 backdrop-blur-sm">
             <Button
+              type="button"
+              onClick={() => setIsDegreePreviewOpen(true)}
+              className="bg-gradient-to-r from-gray-600 via-gray-700 to-gray-800 hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 
+              text-white px-10 py-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl font-medium text-lg mr-4"
+            >
+              Preview Degree
+            </Button>
+            <Button
               type="submit"
               onClick={handleSubmit}
               className="bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700 hover:from-indigo-700 hover:via-blue-700 hover:to-indigo-800 
@@ -341,7 +348,6 @@ export default function CertificateForm() {
             </Button>
           </CardFooter>
         </Card>
-
         <div className="mt-8 text-center">
           <p className="text-sm text-indigo-600">Your certificate will be securely stored on the blockchain with IPFS technology</p>
         </div>
@@ -381,6 +387,42 @@ export default function CertificateForm() {
                   {(formData.profilePhoto.size / 1024).toFixed(2)} KB
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isDegreePreviewOpen && (
+        <div
+          className="fixed inset-0 bg-indigo-900/95 z-50 flex items-center justify-center p-4 transition-opacity duration-300 backdrop-blur-sm"
+          onClick={() => setIsDegreePreviewOpen(false)}
+        >
+          <div className="relative max-w-3xl max-h-screen w-full bg-white rounded-xl overflow-hidden shadow-2xl">
+            <div className="absolute top-4 right-4 z-10">
+              <button
+                className="rounded-full bg-white/90 p-2 shadow-lg hover:bg-white transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsDegreePreviewOpen(false);
+                }}
+              >
+                <X className="h-6 w-6 text-indigo-900" />
+              </button>
+            </div>
+
+            <div className="p-6">
+              <Degree
+                fullName={formData.fullName}
+                studentId={formData.studentId}
+                email={formData.email}
+                universityName={formData.universityName}
+                degreeName={formData.degreeName}
+                graduationYear={formData.graduationYear}
+                issueDate={formData.issueDate}
+                duration={formData.duration}
+                cgpa={formData.cgpa}
+                profilePhoto={formData.profilePhoto}
+              />
             </div>
           </div>
         </div>
