@@ -1,8 +1,16 @@
 'use client';
 
+import { useWallet } from '@solana/wallet-adapter-react';
 import { useState } from 'react';
+import { useVericredProgram } from '../vericred/vericred-data-access';
 
 export default function CertificateForm() {
+  const {publicKey}=useWallet();
+  const {programId}=useVericredProgram();
+
+  console.log(publicKey?.toString());
+  console.log(programId.toString());
+
   const [formData, setFormData] = useState({
     fullName: '',
     studentId: '',
@@ -48,8 +56,7 @@ export default function CertificateForm() {
         console.error('Error response:', data);
         alert(`Failed to submit form: ${data.error?.message || JSON.stringify(data.error) || 'Unknown error'}`);
       } else {
-        alert('Form submitted successfully!');
-        console.log('IPFS Hash:', data.ipfsHash);
+        console.log(data.ipfsHash.toString())
       }
     } catch (err) {
       console.error('Unexpected error:', err);

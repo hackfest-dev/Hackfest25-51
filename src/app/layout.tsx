@@ -1,8 +1,10 @@
 import './globals.css'
-import { ClusterProvider } from '@/components/cluster/cluster-data-access'
+import { ClusterProvider, useCluster } from '@/components/cluster/cluster-data-access'
 import { SolanaProvider } from '@/components/solana/solana-provider'
 import { UiLayout } from '@/components/ui/ui-layout'
 import { ReactQueryProvider } from './react-query-provider'
+import WalletButton from '@/components/wallet/wallet-button'
+import { useMemo } from 'react'
 
 export const metadata = {
   title: 'Vericred',
@@ -21,7 +23,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ReactQueryProvider>
           <ClusterProvider>
+            <SolanaProvider>
             {children}
+            </SolanaProvider>
           </ClusterProvider>
         </ReactQueryProvider>
       </body>

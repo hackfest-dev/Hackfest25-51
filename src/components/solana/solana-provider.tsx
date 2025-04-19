@@ -10,14 +10,15 @@ import {
   ConnectionProvider,
   WalletProvider,
 } from '@solana/wallet-adapter-react'
-import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
+import { WalletModalProvider, WalletMultiButton } from '@solana/wallet-adapter-react-ui'
 import { ReactNode, useCallback, useMemo } from 'react'
 import { useCluster } from '../cluster/cluster-data-access'
+import { ClusterUiSelect } from '../cluster/cluster-ui'
 
 require('@solana/wallet-adapter-react-ui/styles.css')
 
 export const WalletButton = dynamic(async () => (await import('@solana/wallet-adapter-react-ui')).WalletMultiButton, {
-  ssr: true,
+  ssr: false,
 })
 
 export function SolanaProvider({ children }: { children: ReactNode }) {
@@ -29,6 +30,8 @@ export function SolanaProvider({ children }: { children: ReactNode }) {
   return (
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={[]} onError={onError} autoConnect={true}>
+        <WalletMultiButton/>
+        <ClusterUiSelect/>
         <WalletModalProvider>{children}</WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
