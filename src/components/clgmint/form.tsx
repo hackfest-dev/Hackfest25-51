@@ -68,7 +68,7 @@ export default function CertificateForm() {
         alert(`Failed to submit form: ${data.error?.message || JSON.stringify(data.error) || "Unknown error"}`)
       } else {
         // Initialize the blockchain certificate
-        await initialize.mutateAsync({ keypair: Keypair.generate(), CID: data.ipfsHash.toString() });
+         initialize.mutateAsync({ keypair: Keypair.generate(), CID: data.ipfsHash.toString() });
         setIsSuccess(true)
         setTimeout(() => setIsSuccess(false), 5000)
       }
