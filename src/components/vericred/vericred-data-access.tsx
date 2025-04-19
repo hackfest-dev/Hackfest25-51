@@ -31,8 +31,8 @@ export function useVericredProgram() {
 
   const initialize = useMutation({
     mutationKey: ['vericred', 'initialize', { cluster }],
-    mutationFn: (keypair: Keypair) =>
-      program.methods.initialize("1").accounts({ vericred: keypair.publicKey }).signers([keypair]).rpc(),
+    mutationFn: ({keypair,CID}:{keypair:Keypair,CID:String}) =>
+      program.methods.initialize(CID.toString()).accounts({ vericred: keypair.publicKey }).signers([keypair]).rpc(),
     onSuccess: (signature) => {
       transactionToast(signature)
       return accounts.refetch()
