@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { Calendar, GraduationCap, Mail, User, FileImage, Award, CalendarIcon, Clock, BarChart, X, CheckCircle2 } from "lucide-react"
+import { Calendar, GraduationCap, Mail, User, FileImage, Award, CalendarIcon, Clock, BarChart, X, CheckCircle2, Lock } from "lucide-react"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { useVericredProgram } from "../vericred/vericred-data-access"
 import { Keypair } from "@solana/web3.js"
@@ -29,9 +29,11 @@ export default function CertificateForm() {
     duration: "",
     cgpa: "",
   })
-
+  
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const [isDegreePreviewOpen, setIsDegreePreviewOpen] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, files } = e.target as HTMLInputElement
@@ -53,6 +55,7 @@ export default function CertificateForm() {
     }
 
     try {
+      setIsSubmitting(true)
       const res = await fetch("/api/pinata", {
         method: "POST",
         body: payload,
@@ -64,31 +67,74 @@ export default function CertificateForm() {
         console.error("Error response:", data)
         alert(`Failed to submit form: ${data.error?.message || JSON.stringify(data.error) || "Unknown error"}`)
       } else {
-        initialize.mutateAsync({ keypair: Keypair.generate(), CID: data.ipfsHash.toString() });
-      };
+        // Initialize the blockchain certificate
+        await initialize.mutateAsync({ keypair: Keypair.generate(), CID: data.ipfsHash.toString() });
+        setIsSuccess(true)
+        setTimeout(() => setIsSuccess(false), 5000)
+      }
     }
     catch (err) {
       console.error("Unexpected error:", err)
       alert("Something went wrong. Check the console for details.")
     }
+    finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  // Compute form completion percentage
+  const getCompletionPercentage = () => {
+    const totalFields = 10; // Including profile photo
+    let completedFields = 0;
+    
+    Object.entries(formData).forEach(([key, value]) => {
+      if (value && value !== '') completedFields++;
+    });
+    
+    return Math.round((completedFields / totalFields) * 100);
   }
 
   return (
-    <div className="min-h-screen min-w-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-slate-100 py-12 px-4 sm:px-6">
-      <div className="fixed inset-0 overflow-hidden -z-10">
-        <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-indigo-200 opacity-20 blur-3xl"></div>
-        <div className="absolute top-1/4 -left-20 w-72 h-72 rounded-full bg-blue-300 opacity-20 blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 rounded-full bg-sky-200 opacity-20 blur-3xl"></div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white">
+      {/* Error message banner - preserving the original functionality */}
+      {!publicKey && (
+        <div className="w-full bg-yellow-400 text-black py-2 px-6 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <span>Error connecting to cluster local</span>
+          </div>
+          <button className="bg-yellow-500 hover:bg-yellow-600 px-4 py-1 rounded text-sm">
+            Refresh
+          </button>
+        </div>
+      )}
 
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold tracking-tight text-indigo-900 mb-2">Vericred</h1>
-          <p className="text-lg text-indigo-700">Create your verified digital degree with blockchain security</p>
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-8 max-w-screen-2xl mx-auto">
+        <div className="mb-12">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-4xl lg:text-5xl font-bold tracking-tight text-indigo-900 mb-3">Vericred</h1>
+              <p className="text-lg text-indigo-700">Create your verified digital degree with blockchain security</p>
+            </div>
+            {/* Wallet selection UI has been removed */}
+          </div>
+          
+          {/* Progress indicator */}
+          <div className="bg-white rounded-lg shadow-sm border border-indigo-100 p-4 mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-medium text-indigo-900">Application Progress</h3>
+              <span className="text-sm font-bold text-indigo-700">{getCompletionPercentage()}% Complete</span>
+            </div>
+            <div className="w-full bg-indigo-100 rounded-full h-2.5">
+              <div 
+                className="bg-gradient-to-r from-indigo-600 to-indigo-800 h-2.5 rounded-full transition-all duration-500"
+                style={{ width: `${getCompletionPercentage()}%` }}
+              ></div>
+            </div>
+          </div>
         </div>
 
-        <Card className="mx-auto shadow-2xl border-0 overflow-hidden bg-white/90 backdrop-blur-sm">
-          <CardHeader className="space-y-2 text-center bg-gradient-to-r from-indigo-700 via-blue-700 to-indigo-800 text-white rounded-t-lg py-10 relative">
+        <Card className="w-full bg-white shadow-lg border border-indigo-100">
+          <CardHeader className="space-y-2 text-center bg-gradient-to-r from-indigo-700 via-blue-700 to-indigo-800 text-white py-10 relative">
             <div className="absolute inset-0 bg-[url('/api/placeholder/800/200')] opacity-10 mix-blend-overlay bg-cover"></div>
             <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg">
               <GraduationCap className="h-6 w-6 text-indigo-700" />
@@ -99,7 +145,7 @@ export default function CertificateForm() {
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="pt-12">
+          <CardContent className="pt-12 px-4 sm:px-6 lg:px-8">
             <form onSubmit={handleSubmit} className="space-y-8">
               <div className="space-y-6">
                 <div className="flex items-center gap-2 pb-2 border-b border-indigo-100">
@@ -107,7 +153,7 @@ export default function CertificateForm() {
                   <h2 className="font-semibold text-xl text-indigo-900">Personal Information</h2>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="fullName" className="font-medium text-indigo-900">
                       Full Name
@@ -120,6 +166,7 @@ export default function CertificateForm() {
                         onChange={handleChange}
                         className="border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500 pl-10"
                         required
+                        placeholder="Enter your full name"
                       />
                       <User className="h-4 w-4 text-indigo-500 absolute left-3 top-3" />
                     </div>
@@ -137,6 +184,7 @@ export default function CertificateForm() {
                         onChange={handleChange}
                         className="border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500 pl-10"
                         required
+                        placeholder="Enter your student ID"
                       />
                       <Award className="h-4 w-4 text-indigo-500 absolute left-3 top-3" />
                     </div>
@@ -155,6 +203,7 @@ export default function CertificateForm() {
                         onChange={handleChange}
                         className="border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500 pl-10"
                         required
+                        placeholder="Enter your email address"
                       />
                       <Mail className="h-4 w-4 text-indigo-500 absolute left-3 top-3" />
                     </div>
@@ -168,7 +217,7 @@ export default function CertificateForm() {
                   <h2 className="font-semibold text-xl text-indigo-900">Academic Information</h2>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="universityName" className="font-medium text-indigo-900">
                       University Name
@@ -181,6 +230,7 @@ export default function CertificateForm() {
                         onChange={handleChange}
                         className="border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500 pl-10"
                         required
+                        placeholder="Enter your university name"
                       />
                       <GraduationCap className="h-4 w-4 text-indigo-500 absolute left-3 top-3" />
                     </div>
@@ -198,6 +248,7 @@ export default function CertificateForm() {
                         onChange={handleChange}
                         className="border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500 pl-10"
                         required
+                        placeholder="Enter your degree name"
                       />
                       <Award className="h-4 w-4 text-indigo-500 absolute left-3 top-3" />
                     </div>
@@ -215,6 +266,7 @@ export default function CertificateForm() {
                         onChange={handleChange}
                         className="border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500 pl-10"
                         required
+                        placeholder="YYYY"
                       />
                       <Calendar className="h-4 w-4 text-indigo-500 absolute left-3 top-3" />
                     </div>
@@ -250,6 +302,7 @@ export default function CertificateForm() {
                         onChange={handleChange}
                         className="border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500 pl-10"
                         required
+                        placeholder="e.g. 4 years"
                       />
                       <Clock className="h-4 w-4 text-indigo-500 absolute left-3 top-3" />
                     </div>
@@ -267,6 +320,7 @@ export default function CertificateForm() {
                         onChange={handleChange}
                         className="border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500 pl-10"
                         required
+                        placeholder="e.g. 3.8"
                       />
                       <BarChart className="h-4 w-4 text-indigo-500 absolute left-3 top-3" />
                     </div>
@@ -283,8 +337,8 @@ export default function CertificateForm() {
                   <p className="text-xs text-indigo-200 mt-1">Upload a professional portrait for your certificate</p>
                 </div>
 
-                <div className="p-6">
-                  <div className="flex flex-col md:flex-row items-center gap-6">
+                <div className="p-6 lg:p-8">
+                  <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8">
                     <div className="flex-1 w-full">
                       <div className="relative">
                         <Input
@@ -310,7 +364,7 @@ export default function CertificateForm() {
                     {formData.profilePhoto && (
                       <div className="flex-shrink-0">
                         <div
-                          className="h-24 w-24 rounded-full bg-white overflow-hidden shadow-lg cursor-pointer 
+                          className="h-32 w-32 lg:h-40 lg:w-40 rounded-full bg-white overflow-hidden shadow-lg cursor-pointer 
                           border-4 border-white ring-2 ring-indigo-200 hover:ring-indigo-400 transition-all duration-300"
                           onClick={() => setIsPreviewOpen(true)}
                         >
@@ -326,39 +380,109 @@ export default function CertificateForm() {
                   </div>
                 </div>
               </div>
+
+              {/* Blockchain verification info */}
+              <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-6">
+                <div className="flex items-start md:items-center gap-4 flex-col md:flex-row">
+                  <div className="rounded-full bg-indigo-100 p-3">
+                    <Lock className="h-6 w-6 text-indigo-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-indigo-900 mb-1">Blockchain Verification</h3>
+                    <p className="text-indigo-700 text-sm">Your certificate will be securely stored on the Solana blockchain with IPFS technology, making it tamper-proof and easily verifiable by employers and institutions.</p>
+                  </div>
+                </div>
+              </div>
             </form>
           </CardContent>
 
-          <CardFooter className="flex justify-end p-8 border-t border-indigo-100 bg-indigo-50/50 backdrop-blur-sm">
-            <Button
-              type="button"
-              onClick={() => setIsDegreePreviewOpen(true)}
-              className="bg-gradient-to-r from-gray-600 via-gray-700 to-gray-800 hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 
-              text-white px-10 py-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl font-medium text-lg mr-4"
-            >
-              Preview Degree
-            </Button>
-            <Button
-              type="submit"
-              onClick={handleSubmit}
-              className="bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700 hover:from-indigo-700 hover:via-blue-700 hover:to-indigo-800 
-              text-white px-10 py-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl font-medium text-lg"
-            >
-              Generate Degree
-            </Button>
+          <CardFooter className="flex justify-between items-center p-6 lg:p-8 border-t border-indigo-100 bg-white">
+            <div className="text-sm text-indigo-600">
+              {isSuccess && (
+                <div className="flex items-center text-green-600">
+                  <CheckCircle2 className="h-5 w-5 mr-2" />
+                  Certificate successfully generated and stored on blockchain
+                </div>
+              )}
+            </div>
+            <div className="flex gap-4">
+              <Button
+                type="button"
+                onClick={() => setIsDegreePreviewOpen(true)}
+                className="bg-gradient-to-r from-gray-600 via-gray-700 to-gray-800 hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 
+                text-white px-6 py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg font-medium"
+              >
+                Preview Degree
+              </Button>
+              <Button
+                type="submit"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700 hover:from-indigo-700 hover:via-blue-700 hover:to-indigo-800 
+                text-white px-6 py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg font-medium relative"
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center gap-2">
+                    <span className="animate-pulse">Processing...</span>
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                  </div>
+                ) : (
+                  "Generate Degree"
+                )}
+              </Button>
+            </div>
           </CardFooter>
         </Card>
-        <div className="mt-8 text-center">
-          <p className="text-sm text-indigo-600">Your certificate will be securely stored on the blockchain with IPFS technology</p>
+
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white p-6 rounded-xl shadow-md border border-indigo-100">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                <Lock className="h-5 w-5 text-indigo-600" />
+              </div>
+              <h3 className="font-semibold text-indigo-900">Secure & Tamper-proof</h3>
+            </div>
+            <p className="text-indigo-700 text-sm">Your credentials are securely stored on the blockchain, making them impossible to forge or alter.</p>
+          </div>
+          
+          <div className="bg-white p-6 rounded-xl shadow-md border border-indigo-100">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                <GraduationCap className="h-5 w-5 text-indigo-600" />
+              </div>
+              <h3 className="font-semibold text-indigo-900">Globally Recognized</h3>
+            </div>
+            <p className="text-indigo-700 text-sm">Digital credentials that can be verified anywhere in the world, anytime.</p>
+          </div>
+          
+          <div className="bg-white p-6 rounded-xl shadow-md border border-indigo-100">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                <User className="h-5 w-5 text-indigo-600" />
+              </div>
+              <h3 className="font-semibold text-indigo-900">Student-Owned</h3>
+            </div>
+            <p className="text-indigo-700 text-sm">You control your own credentials and can share them with employers and institutions with ease.</p>
+          </div>
         </div>
+
+        <footer className="mt-12 text-center border-t border-indigo-100 pt-8 pb-16">
+          <div className="flex justify-center gap-4 mb-4">
+            <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+              <GraduationCap className="h-5 w-5 text-indigo-600" />
+            </div>
+          </div>
+          <h2 className="font-bold text-2xl text-indigo-900 mb-2">Vericred</h2>
+          <p className="text-indigo-600 text-sm">Blockchain-verified academic credentials</p>
+        </footer>
       </div>
 
       {isPreviewOpen && formData.profilePhoto && (
         <div
-          className="fixed inset-0 bg-indigo-900/95 z-50 flex items-center justify-center p-4 transition-opacity duration-300 backdrop-blur-sm"
+          className="fixed inset-0 bg-indigo-900/95 z-50 flex items-center justify-center p-4 lg:p-8 transition-opacity duration-300 backdrop-blur-sm"
           onClick={() => setIsPreviewOpen(false)}
         >
-          <div className="relative max-w-3xl max-h-screen w-full bg-white rounded-xl overflow-hidden shadow-2xl">
+          <div className="relative max-w-4xl max-h-[90vh] w-full bg-white rounded-xl overflow-hidden shadow-2xl">
             <div className="absolute top-4 right-4 z-10">
               <button
                 className="rounded-full bg-white/90 p-2 shadow-lg hover:bg-white transition-colors"
@@ -394,10 +518,10 @@ export default function CertificateForm() {
 
       {isDegreePreviewOpen && (
         <div
-          className="fixed inset-0 bg-indigo-900/95 z-50 flex items-center justify-center p-4 transition-opacity duration-300 backdrop-blur-sm"
+          className="fixed inset-0 bg-indigo-900/95 z-50 flex items-center justify-center p-4 lg:p-8 transition-opacity duration-300 backdrop-blur-sm"
           onClick={() => setIsDegreePreviewOpen(false)}
         >
-          <div className="relative max-w-3xl max-h-screen w-full bg-white rounded-xl overflow-hidden shadow-2xl">
+          <div className="relative max-w-5xl max-h-[90vh] w-full bg-white rounded-xl overflow-hidden shadow-2xl">
             <div className="absolute top-4 right-4 z-10">
               <button
                 className="rounded-full bg-white/90 p-2 shadow-lg hover:bg-white transition-colors"
@@ -410,17 +534,17 @@ export default function CertificateForm() {
               </button>
             </div>
 
-            <div className="p-6">
+            <div className="p-6 overflow-auto">
               <Degree
-                fullName={formData.fullName}
-                studentId={formData.studentId}
-                email={formData.email}
-                universityName={formData.universityName}
-                degreeName={formData.degreeName}
-                graduationYear={formData.graduationYear}
-                issueDate={formData.issueDate}
-                duration={formData.duration}
-                cgpa={formData.cgpa}
+                fullName={formData.fullName || "Your Name"}
+                studentId={formData.studentId || "ID12345"}
+                email={formData.email || "student@example.com"}
+                universityName={formData.universityName || "University Name"}
+                degreeName={formData.degreeName || "Bachelor of Science"}
+                graduationYear={formData.graduationYear || "2025"}
+                issueDate={formData.issueDate || "2025-04-20"}
+                duration={formData.duration || "4 years"}
+                cgpa={formData.cgpa || "3.8"}
                 profilePhoto={formData.profilePhoto}
               />
             </div>
